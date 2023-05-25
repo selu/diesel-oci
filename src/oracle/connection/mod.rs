@@ -693,3 +693,26 @@ impl R2D2Connection for OciConnection {
                 && !self.transaction_manager.is_test_transaction
     }
 }
+
+#[cfg(feature = "rocket")]
+use rocket_sync_db_pools::{
+    rocket::{Build, Rocket},
+    Config, PoolResult, Poolable,
+};
+
+#[cfg(feature = "rocket")]
+impl Poolable for OciConnection {
+    type Manager = diesel::r2d2::ConnectionManager<OciConnection>;
+
+    type Error = std::convert::Infallible;
+
+    fn pool(db_name: &str, rocket: &Rocket<Build>) -> PoolResult<Self> {
+        let config = Config::from(db_name, rocket)?;
+        let manager = diesel::r2d2::ConnectionManager::new(&config.url);
+        let pool = diesel::r2d2::Pool::builder()
+            .max_size(config.pool_size)
+            .connection_timeout(std::time::Duration::from_secs(config.timeout as u64))
+            .build(manager)?;
+        Ok(pool)
+    }
+}

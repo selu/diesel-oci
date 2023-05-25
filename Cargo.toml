@@ -26,6 +26,10 @@ default-features = false
 version = "0.4"
 package = "chrono"
 
+[dependencies.rocket_sync_db_pools]
+optional = true
+version = "0.1.0-rc.3"
+
 [dependencies.diesel]
 default-features = false
 features = ["i-implement-a-third-party-backend-and-opt-into-breaking-changes"]
@@ -47,6 +51,7 @@ num-derive = "0.1"
 
 [features]
 default = []
+rocket = ["r2d2", "rocket_sync_db_pools"]
 chrono = ["chrono-time", "diesel/chrono"]
 r2d2 = ["diesel/r2d2"]
 dynamic-schema = ["diesel-dynamic-schema"]
